@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalhes do Quiz</title>
+
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            background: #28211E;
+            color: #fff;
+            padding: 2rem;
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+            color: #E9BFA8;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #1f1a18;
+            padding: 2rem;
+            border-radius: 12px;
+        }
+
+        .info-box {
+            margin-bottom: 1.5rem;
+            background: #28211E;
+            padding: 1rem;
+            border-radius: 10px;
+            border-left: 5px solid #8F5553;
+        }
+
+        .info-box p {
+            margin: 5px 0;
+            font-size: 1rem;
+        }
+
+        .answers-box {
+            background: #28211E;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid #DF7E7A;
+        }
+
+        .answers-box h3 {
+            color: #DF7E7A;
+        }
+
+        .page-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #E9BFA8;
+        }
+
+        .answer-item {
+            margin-left: 10px;
+            padding: 6px 0;
+            font-size: 1rem;
+            border-bottom: 1px solid #3a302d;
+        }
+
+        textarea {
+            width: 100%;
+            background: #1f1a18;
+            border: 2px solid #8F5553;
+            border-radius: 10px;
+            padding: 1rem;
+            color: #fff;
+            resize: vertical;
+            font-size: 1rem;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #DF7E7A;
+        }
+
+        .save-btn {
+            display: inline-block;
+            margin-top: 1.2rem;
+            background: linear-gradient(50deg, #DF7E7A, #B76A66, #8F5553);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 1rem;
+            background: #3a302d;
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #8F5553;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="/admin" class="back-btn">← Voltar</a>
+
+    <h1>Detalhes do Quiz</h1>
+
+    <div class="container">
+
+        <!-- INFORMAÇÕES DO USUÁRIO -->
+        <div class="info-box">
+            <h2>Informações do Usuário</h2>
+            <p><strong>Nome:</strong> {{ quiz.nome if quiz.nome else "Usuário Anônimo" }}</p>
+            <p><strong>Email:</strong> {{ quiz.email if quiz.email else "-" }}</p>
+            <p><strong>ID Quiz:</strong> {{ quiz.id }}</p>
+            <p><strong>Data:</strong> {{ quiz.created_at }}</p>
+        </div>
+
+        <!-- RESPOSTAS -->
+        <div class="answers-box">
+            <h2>Respostas do Usuário</h2>
+
+            {% for ans in answers %}
+            <div style="margin-bottom: 1rem;">
+                <div class="page-title">Página {{ ans.page }}</div>
+
+                {% set parsed = ans.answers_json | safe | loads %}
+
+                {% if parsed.choices %}
+                <div class="answer-item">Escolhas: {{ parsed.choices | join(', ') }}</div>
+                {% endif %}
+
+                {% if parsed.skip %}
+                <div class="answer-item" style="color:#df7e7a;">Usuário pulou esta página</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+        </div>
+
+        <!-- ROTINA DO ADMIN -->
+        <div class="answers-box">
+            <h2>Rotina criada pelo Administrador</h2>
+
+            <form method="POST" action="{{ url_for('admin_save_routine') }}">
+                <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+
+                <textarea name="routine" rows="8"
+                    placeholder="Escreva aqui a rotina personalizada do usuário...">{{ routine }}</textarea>
+
+                <button class="save-btn" type="submit">Salvar Rotina</button>
+            </form>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel do Administrador</title>
+
+    <style>
+        body { font-family: "Poppins", sans-serif; background: #28211E; color: #fff; padding: 2rem; }
+        h1 { text-align: center; margin-bottom: 2rem; color: #E9BFA8; }
+        .table-container { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; background: #1f1a18; border-radius: 10px; overflow: hidden; }
+        th { background: #8F5553; padding: 1rem; text-align: left; font-size: 1rem; }
+        td { padding: 1rem; border-bottom: 1px solid #3a302d; font-size: 0.95rem; }
+        tr:hover { background: #3a302d; }
+        .status-enviado { color: #8ef58e; font-weight: 600; }
+        .status-pendente { color: #df7e7a; font-weight: 600; }
+        .detalhes-btn { background: linear-gradient(50deg,#DF7E7A,#B76A66,#8F5553); color:#fff; border:none; padding:7px 15px; border-radius:100px; cursor:pointer; transition:0.3s ease;}
+        .detalhes-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; }
+        .modal-content { background:#1f1a18; padding:2rem; border-radius:12px; width:90%; max-width:500px; }
+        .close-btn { float:right; cursor:pointer; font-size:1.2rem; color:#fff; }
+        .close-btn:hover { color:#df7e7a; }
+    </style>
+</head>
+
+<body>
+    <h1>Painel do Administrador</h1>
+
+    <div class="table-container">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Usuário</th>
+                <th>Email</th>
+                <th>Página</th>
+                <th>Respostas</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+
+            {% for r in dados %}
+            <tr>
+                <td>{{ r.id }}</td>
+                <td>{{ r.nome if r.nome else "Usuário Anônimo" }}</td>
+                <td>{{ r.email if r.email else "-" }}</td>
+                <td>{{ r.page }}</td>
+                <td>{{ r.answers }}</td>
+                <td>
+                    {% if r.sent_to_admin == 1 %}
+                        <span class="status-enviado">Enviado</span>
+                    {% else %}
+                        <span class="status-pendente">Pendente</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <!-- Passamos os dados em atributos data-*, sempre com tojson -->
+                    <button
+                        class="detalhes-btn"
+                        data-nome='{{ r.nome|tojson }}'
+                        data-email='{{ r.email|tojson }}'
+                        data-pagina='{{ r.page|tojson }}'
+                        data-respostas='{{ r.answers|tojson }}'
+                    >
+                        Ver detalhes
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true">
+            <span class="close-btn" id="modalClose">×</span>
+
+            <h2 id="modalNome"></h2>
+            <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+            <p><strong>Página:</strong> <span id="modalPagina"></span></p>
+            <p><strong>Respostas:</strong></p>
+            <pre id="modalResp" style="white-space:pre-wrap;"></pre>
+        </div>
+    </div>
+
+    <script>
+        // Função que abre o modal (recebe valores já "decodificados")
+        function abrirModal(nome, email, pagina, respostas) {
+            document.getElementById("modalNome").innerText = nome || "Usuário Anônimo";
+            document.getElementById("modalEmail").innerText = email || "-";
+            document.getElementById("modalPagina").innerText = pagina || "—";
+
+            let texto = "";
+            if (Array.isArray(respostas)) {
+                texto = respostas.join(", ");
+            } else if (typeof respostas === "object" && respostas !== null) {
+                // exibir objeto de forma legível
+                texto = JSON.stringify(respostas, null, 2);
+            } else {
+                texto = respostas || "Sem respostas";
+            }
+            document.getElementById("modalResp").innerText = texto;
+
+            const modal = document.getElementById("modal");
+            modal.style.display = "flex";
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function fecharModal() {
+            const modal = document.getElementById("modal");
+            modal.style.display = "none";
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        // Fecha ao clicar no X
+        document.getElementById("modalClose").addEventListener("click", fecharModal);
+
+        // Fecha ao clicar fora do conteúdo do modal
+        document.getElementById("modal").addEventListener("click", function (e) {
+            if (e.target === this) fecharModal();
+        });
+
+        // Ligar os botões 'Ver detalhes' que têm os data-attributes
+        document.querySelectorAll('.detalhes-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                // usamos getAttribute + JSON.parse para decodificar exatamente o que tojson gerou
+                function safeParse(attrName) {
+                    const raw = btn.getAttribute(attrName);
+                    if (raw === null || raw === undefined) return null;
+                    try {
+                        return JSON.parse(raw);
+                    } catch (err) {
+                        // se não for JSON (raro), retorna o valor cru
+                        return raw;
+                    }
+                }
+
+                const nome = safeParse('data-nome');
+                const email = safeParse('data-email');
+                const pagina = safeParse('data-pagina');
+                const respostas = safeParse('data-respostas');
+
+                abrirModal(nome, email, pagina, respostas);
+            });
+        });
+    </script>
+</body>
+
+</html>

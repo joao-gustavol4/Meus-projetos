@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz 7</title>
+
+    <!-- CSS base -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz7.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive_quiz.css') }}">
+
+    <!-- Botão selected (mesmo estilo do restante) -->
+    <style>
+        .btn-action {
+            background: linear-gradient(50deg, #DF7E7A, #B76A66, #8F5553);
+            border: none;
+            border-radius: 200px;
+            padding: 1rem 2rem;
+            font-size: 1.5rem;
+            color: #fff;
+            cursor: pointer;
+            transition: 0.3s ease;
+            width: 450px;
+            margin: 1rem auto;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
+        }
+    </style>
+
+</head>
+
+<body data-page="7">
+
+    <header>
+        <img src="{{ url_for('static', filename='img/skincare.png') }}" alt="">
+        <hr>
+    </header>
+
+    <div class="titulo">
+        {% if not session.get('user_id') %}
+        <h2>Faça login para enviar suas respostas</h2>
+        {% else %}
+        <h2>Clique abaixo para enviar suas respostas ao administrador</h2>
+        {% endif %}
+    </div>
+
+    <div class="perguntas">
+        {% if not session.get('user_id') %}
+        <a href="{{ url_for('cadastro') }}">
+            <button class="btn-action">REGISTRE-SE</button>
+        </a>
+
+        <a href="{{ url_for('login') }}">
+            <button class="btn-action">LOGIN</button>
+        </a>
+        {% else %}
+        <button id="sendBtn" class="btn-action">ENVIAR RESPOSTAS</button>
+        {% endif %}
+    </div>
+
+    <div class="bolinhas">
+        <span class="bolinha1"></span>
+        <span class="bolinha1"></span>
+        <span class="bolinha1"></span>
+        <span class="bolinha1"></span>
+        <span class="bolinha1"></span>
+        <span class="bolinha1"></span>
+        <span class="shadow"></span>
+    </div>
+
+    <footer class="prx">
+        <a id="back" href="{{ url_for('quiz6') }}">←</a>
+    </footer>
+
+    {% if session.get('user_id') %}
+    <script>
+        // Quando o usuário está logado, este script ativa o envio ao admin
+        document.addEventListener("DOMContentLoaded", () => {
+            const btn = document.getElementById("sendBtn");
+
+            btn.addEventListener("click", async () => {
+
+                btn.disabled = true;
+                btn.textContent = "Enviando...";
+
+                try {
+                    const resp = await fetch("/api/send_to_admin", {
+                        method: "POST"
+                    });
+
+                    const data = await resp.json();
+                    if (data.ok) {
+                        alert("Respostas enviadas com sucesso!");
+                        window.location.href = "/";
+                    } else {
+                        alert("Erro ao enviar respostas.");
+                    }
+                } catch (e) {
+                    alert("Erro de rede.");
+                }
+
+                btn.disabled = false;
+                btn.textContent = "ENVIAR RESPOSTAS";
+            });
+        });
+    </script>
+    {% endif %}
+
+</body>
+
+</html>

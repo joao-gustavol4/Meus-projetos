@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz 2</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz4.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive_quiz.css') }}">
+
+    <style>
+        .btn.selected {
+            transform: translateY(-3px) !important;
+            background: linear-gradient(50deg, #DF7E7A, #B76A66, #8F5553) !important;
+            border: none !important;
+            color: #fff !important;
+            box-shadow: 0 0 8px 2px rgba(223, 126, 122, 0.4),
+                0 0 15px 4px rgba(183, 106, 102, 0.25) !important;
+        }
+    </style>
+</head>
+
+<body data-page="4">
+    <header>
+        <img src="{{ url_for('static', filename='img/skincare.png') }}" alt="">
+        <hr>
+    </header>
+
+    <section class="linha"></section>
+
+    <div class="titulo">
+        <h2 class="pg">Você tem alguma preocupação com a área dos olhos?</h2>
+        <p>Selecione uma das opções abaixo para continuar</p>
+    </div>
+
+    <div class="perguntas">
+        <button type="button" class="btn option" data-value="Olheiras">Olheiras</button>
+        <button type="button" class="btn option" data-value="Linhas finas e rugas">Linhas finas e rugas</button>
+        <button type="button" class="btn option" data-value="Inchaço sob os olhos">Inchaço sob os olhos</button>
+        <button type="button" class="btn option" data-value="Sem preocupações">Sem preocupações</button>
+        <button type="button" class="btn option" data-value="Todas as alternativas">Todas as alternativas</button>
+    </div>
+
+    <div class="bolinhas">
+        <span class="bolinha1"></span>
+        <span class="bolinha1"></span>
+        <span class="bolinha1"></span>
+        <span class="shadow"></span>
+        <span class="empty"></span>
+        <span class="empty"></span>
+        <span class="empty"></span>
+    </div>
+
+    <footer class="prx">
+        <button id="nextBtn" class="btn" style="width:150px; height:40px;">próximo →</button>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const page = parseInt(document.body.dataset.page);
+            const optionButtons = [...document.querySelectorAll(".option")];
+            const nextBtn = document.getElementById("nextBtn");
+
+            optionButtons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    optionButtons.forEach(b => b.classList.remove("selected"));
+                    btn.classList.add("selected");
+                });
+            });
+
+            nextBtn.addEventListener("click", async () => {
+
+                const selected = optionButtons
+                    .filter(b => b.classList.contains("selected"))
+                    .map(b => b.textContent.trim());
+
+                if (selected.length === 0) {
+                    alert("Selecione uma opção.");
+                    return;
+                }
+
+                nextBtn.disabled = true;
+                nextBtn.textContent = "Enviando...";
+
+                const resp = await fetch("/api/save_answer", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ page, choices: selected })
+                });
+
+                const data = await resp.json();
+                window.location.href = data.next;
+            });
+
+        });
+    </script>
+</body>
+
+</html>

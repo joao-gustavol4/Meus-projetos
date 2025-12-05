@@ -1,0 +1,185 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+*,
+*::before
+*::after {box-sizing: border-box;}
+
+body{
+    background: #28211E;
+    text-align: center;
+    font-family: "Poppins", sans-serif;
+    padding: 3rem;        
+    display: flex;            
+    flex-direction: column;
+    overflow: auto;
+    min-height: 90vh;
+  }
+
+.btn{
+    background: #28211E;
+    border: 3PX solid #fff;
+    padding: 1rem 2rem;
+    border-radius: 200px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    transition: background 0.3 ease;
+    width: 463px;
+    height: 76px;
+    color: #fff;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem;
+    
+}
+
+.btn:focus {
+  transform: translateY(-3px);
+  background: linear-gradient(50deg, #DF7E7A, #B76A66, #8F5553);
+  transition: 0.3s ease;
+  border: none;
+  color: #ffffff;
+  box-shadow: 0 0 8px 2px rgba(223, 126, 122, 0.4),
+              0 0 15px 4px rgba(183, 106, 102, 0.25);
+}
+
+header{
+    margin-top: 5px;
+  }
+
+header hr {
+    width: 100vw;      
+    margin-left: calc(-1 * 3rem); 
+    height: 3px;
+    background-color: #fff;
+    border: none;
+  }
+
+.titulo{
+    color: #fff;
+    font-size: 1.25rem;
+    transform: translateY(-10px);
+  }
+
+/* EXTRA SPACE: reservado para a mensagem que aparece depois da 1ª escolha */
+.extra-space {
+  min-height: 56px;   /* reserva espaço para evitar pulo do layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+.texto-extra {
+  color: #ffffffb5;
+  font-size: 1rem;
+  margin: 0;
+  visibility: visible; /* JS controla visibility:hidden/visible */
+}
+
+/* mantém seu display original: grid responsivo com largura fixa dos botões */
+.perguntas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 463px));
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* seleção visual */
+.option.selected {
+  background: linear-gradient(50deg,#DF7E7A,#B76A66,#8F5553);
+  border: none;
+  transform: translateY(-3px);
+  color: #fff;
+  box-shadow: 0 0 8px 2px rgba(223,126,122,0.4),
+              0 0 15px 4px rgba(183,106,102,0.25);
+}
+
+.logo{
+    margin-top: -40px;
+    width: 550px;
+    height: auto;
+  }
+
+a{
+    text-decoration: none;
+    color:#fff;
+  }
+hr{
+    width: 100%;
+    height: 3px;
+    background-color: #fff;
+    padding: 0;
+    margin: 0;
+    left: 0;
+  }
+
+.bolinhas {
+      position: fixed;
+      bottom: 120px;  
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      z-index: 10;
+    }
+
+.bolinha1, .shadow, .empty {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+.bolinha1 {
+  background: radial-gradient(circle at top left, #8F5553, #DF7E7A, #E9BFA8);
+}
+.shadow{
+  box-shadow: 0 0 6px #DF7E7A;
+  background: radial-gradient(circle at top left, #8F5553, #DF7E7A, #E9BFA8);
+}
+.empty{
+  background: #28211E;
+  border: 1px solid #000;
+}
+
+/* footer */
+footer.prx {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: auto; 
+    background: transparent; 
+    padding-top: 40px;
+  }
+
+#proximo{
+    background: linear-gradient(50deg, #DF7E7A, #B76A66, #8F5553);
+    border-radius: 300px;
+    border: 0;
+    padding: 0.6rem 1.5rem;
+    color: #fff;
+    height: 40px;
+    width: 150px;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    text-align: center;
+    display: flex;
+    font-family: "Poppins", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+    transition: 0.3s ease;
+    cursor: pointer;
+  }
+#proximo:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.1);
+  }
+
+@media screen and (max-width: 520px) {
+    .btn { width: 92%; }
+    .logo { width: 320px; }
+    .extra-space { min-height: 70px; }
+}

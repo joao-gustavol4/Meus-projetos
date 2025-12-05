@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Questionario - Quiz 1</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz1.css') }}">
+</head>
+<body>
+
+  <header>
+    <img src="{{ url_for('static', filename='img/skincare.png') }}" alt="" class="logo">
+    <hr>
+    <div class="titulo">
+      <h2 class="pg">Qual é sua principal preocupação com cuidados com a pele?</h2>
+    </div>
+  </header>
+
+  <main>
+    <!-- espaço reservado para o texto extra -->
+    <div id="extra-space" class="extra-space">
+      <p id="texto-extra" class="texto-extra">Selecione até mais 2 opções ou pule esta opção.</p>
+    </div>
+
+    <div class="perguntas" id="optionsContainer">
+      <button type="button" class="btn option" data-value="Acne & Erupções cutâneas">Acne & Erupções cutâneas</button>
+      <button type="button" class="btn option" data-value="Rugas">Rugas</button>
+      <button type="button" class="btn option" data-value="Textura irregular da pele">Textura irregular da pele</button>
+      <button type="button" class="btn option" data-value="Cravos">Cravos</button>
+      <button type="button" class="btn option" data-value="Hiperpigmentação">Hiperpigmentação</button>
+      <button type="button" class="btn option" data-value="Pele desidratada">Pele desidratada</button>
+      <button type="button" class="btn option" data-value="Pele seca">Pele seca</button>
+      <button type="button" class="btn option" data-value="Pele avermelhada">Pele avermelhada</button>
+      <button type="button" class="btn option" data-value="Pele opaca">Pele opaca</button>
+      <button type="button" class="btn option" data-value="Cicatrizes de manchas">Cicatrizes de manchas</button>
+      <button type="button" class="btn option" data-value="Pele oleosa">Pele oleosa</button>
+      <button type="button" class="btn option" data-value="Barreira cutânea danificada">Barreira cutânea danificada</button>
+    </div>
+  </main>
+
+  <div class="bolinhas">
+    <span class="shadow"></span>
+    <span class="empty"></span><span class="empty"></span><span class="empty"></span>
+    <span class="empty"></span><span class="empty"></span><span class="empty"></span>
+  </div>
+
+  <footer class="prx">
+    <button id="proximo" class="btn" type="button">próximo →</button>
+  </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const maxExtras = 2;
+  const optionButtons = Array.from(document.querySelectorAll('.option'));
+  const nextBtn = document.getElementById('proximo');
+  const textoExtra = document.getElementById('texto-extra');
+
+  // keep space reserved but keep text hidden until first selection
+  textoExtra.style.visibility = 'hidden';
+
+  let primeira = null;
+  let extras = [];
+
+  function refreshVisual() {
+    optionButtons.forEach(b => {
+      if (b.classList.contains('selected')) {
+        b.style.border = 'none';
+        b.style.background = 'linear-gradient(50deg, #DF7E7A, #B76A66, #8F5553)';
+        b.style.color = '#fff';
+        b.style.transform = 'translateY(-3px)';
+      } else {
+        b.style.background = '#28211E';
+        b.style.color = '#fff';
+        b.style.border = '3px solid #fff';
+        b.style.transform = 'none';
+      }
+    });
+  }
+
+  optionButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const val = btn.dataset.value;
+      if (!primeira) {
+        primeira = val;
+        btn.classList.add('selected');
+        textoExtra.style.visibility = 'visible';
+        nextBtn.innerText = 'pular';
+        refreshVisual();
+        return;
+      }
+      if (val === primeira) return;
+      if (extras.includes(val)) {
+        extras = extras.filter(x => x !== val);
+        btn.classList.remove('selected');
+        refreshVisual();
+        return;
+      }
+      if (extras.length >= maxExtras) {
+        btn.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(0)' }], { duration: 180 });
+        return;
+      }
+      extras.push(val);
+      btn.classList.add('selected');
+      refreshVisual();
+    });
+  });
+
+  nextBtn.addEventListener('click', async () => {
+    if (!primeira) return;
+    const payload = {
+      page: 1,
+      choices: [primeira, ...extras],
+      skip: false
+    };
+    try {
+      const resp = await fetch('/api/save_answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await resp.json();
+      if (data && data.next) {
+        window.location.href = data.next;
+      } else {
+        window.location.href = "{{ url_for('quiz2') }}";
+      }
+    } catch (e) {
+      console.error(e);
+      window.location.href = "{{ url_for('quiz2') }}";
+    }
+  });
+});
+</script>
+
+</body>
+</html>
